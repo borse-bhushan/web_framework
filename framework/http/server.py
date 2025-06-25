@@ -1,12 +1,13 @@
 import socketserver
 
 from ..route import get_handler
+from ..exceptions.exceptions import NotFoundException, ContentTypeException
 
 from .request import Request
+from .responses import JsonResponse, BaseResponse
 
 
 class HTTPRequestHandler(socketserver.BaseRequestHandler):
-    routes = {}
 
     def recv_all(self, buffer_size=1024):
         """Receive data from the socket."""
@@ -32,55 +33,44 @@ class HTTPRequestHandler(socketserver.BaseRequestHandler):
 
     def dispatch_request(self, request: Request):
         """Dispatch the request to the appropriate handler."""
-        handler = get_handler(request.url)
+        handler = get_handler(request.path, request.method)
 
         if callable(handler):
             return handler(request)
 
-        return "Hello"
+        raise NotFoundException()
+
+    def generate_response(self, request: Request, response: BaseResponse):
+        """Generate a response based on the request."""
+        return response.to_response(request)
+
+    def handle_request(self, request: Request):
+        """Handle the request and return a response."""
+        try:
+            response = self.dispatch_request(request)
+        except (NotFoundException, ContentTypeException) as e:
+            response = JsonResponse(
+                data={"error": e.message},
+                status_code=e.status_code,
+            )
+
+        return self.generate_response(request, response)
 
     def handle(self):
+        """Handle the incoming request."""
+
         data = self.recv_all()
         if not data:
             return
 
-        lines = data.splitlines()
-        request_line = lines[0]
-        method, path, _ = request_line.split()
+        request = Request()
+        request.parse_request(data)
 
-        request = Request(
-            method=method,
-            url=path,
-            headers={
-                line.split(": ")[0]: line.split(": ")[1]
-                for line in lines[1:]
-                if ": " in line
-            },
-            body=data.split("\r\n\r\n", 1)[1] if "\r\n\r\n" in data else "",
-        )
+        response = self.handle_request(request)
 
-        response = self.dispatch_request(request)
-
-        # HTTP Response
-        response = (
-            "HTTP/1.1 200 OK\r\n"
-            "Content-Type: text/plain\r\n"
-            f"Content-Length: {len(response)}\r\n"
-            "\r\n"
-            f"{response}"
-        )
         self.request.sendall(response.encode())
 
-    @classmethod
-    def route(cls, path, method="GET"):
-        def decorator(func):
-            cls.routes[(method.upper(), path)] = func
-            return func
-
-        return decorator
-
-    def not_found(self):
-        return "404 Not Found"
+        return True
 
 
 class HTTPServer(socketserver.ThreadingTCPServer):

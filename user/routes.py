@@ -1,8 +1,6 @@
 from framework.route import register_routes
 
-from .handler import hello_world
+from .handler import create_user
 
 
-register_routes(route="/hello", handler_func=hello_world)
-
-print("Routes registered in user module.")
+register_routes(route="/user", handler_func=create_user, http_methods=None)
