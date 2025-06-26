@@ -11,32 +11,46 @@ class HTTPRequestHandler(socketserver.BaseRequestHandler):
 
     def recv_all(self, buffer_size=1024):
         """Receive data from the socket."""
+
         buffer = b""
+
+        # Step 1: Read until we find the end of headers
         while b"\r\n\r\n" not in buffer:
             data = self.request.recv(buffer_size)
             if not data:
                 break
             buffer += data
 
-        headers = buffer.decode("utf-8", errors="replace")
+        # Split header and the beginning of the body
+        header_part, _, body_start = buffer.partition(b"\r\n\r\n")
+
+        headers_text = header_part.decode("utf-8", errors="replace")
         content_length = 0
 
-        for line in headers.split("\r\n"):
+        # Step 2: Extract Content-Length (if present)
+        for line in headers_text.split("\r\n"):
             if line.lower().startswith("content-length:"):
-                content_length = int(line.split(":")[1].strip())
+                content_length = int(line.split(":", 1)[1].strip())
 
-        body_bytes = b""
+        # Step 3: Continue reading the body (if any)
+        body_bytes = body_start
         while len(body_bytes) < content_length:
-            body_bytes += self.request.recv(buffer_size)
+            chunk = self.request.recv(buffer_size)
+            if not chunk:
+                break
+            body_bytes += chunk
 
-        return headers + body_bytes.decode("utf-8", errors="replace")
+        # Combine both parts
+        full_request = header_part + b"\r\n\r\n" + body_bytes
+        return full_request.decode("utf-8", errors="replace")
+
 
     def dispatch_request(self, request: Request):
         """Dispatch the request to the appropriate handler."""
-        handler = get_handler(request.path, request.method)
+        handler, path_params = get_handler(request.path, request.method)
 
         if callable(handler):
-            return handler(request)
+            return handler(request, **path_params)
 
         raise NotFoundException()
 

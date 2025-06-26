@@ -1,3 +1,5 @@
+import re
+
 from ..constants import METHOD_LIST
 
 
@@ -13,6 +15,7 @@ class RouteRegistry:
                 "route": route,
                 "handler_func": handler_func,
                 "http_methods": http_methods,
+                "r_route": self._convert_path_to_regex(route),
             }
         )
 
@@ -20,10 +23,33 @@ class RouteRegistry:
         """Retrieve the handler function for a given route."""
 
         for r in self.routes:
-            if r["route"] == route and method in r["http_methods"]:
-                return r["handler_func"]
+            if method not in r["http_methods"]:
+                continue
 
-        return None
+            match = re.match(r["r_route"], route)
+            if not match:
+                continue
+
+            return r["handler_func"], match.groupdict()
+
+        return None, {}
+
+    def _convert_path_to_regex(self, path: str) -> str:
+        # Replace <int:name> → (?P<name>\d+)
+        path = re.sub(
+            r"<int:([a-zA-Z_]+)>",
+            lambda m: f"(?P<{m.group(1)}>\\d+)",
+            path,
+        )
+
+        # Replace <str:name> → (?P<name>[^/]+)
+        path = re.sub(
+            r"<str:([a-zA-Z_]+)>",
+            lambda m: f"(?P<{m.group(1)}>[^/]+)",
+            path,
+        )
+
+        return f"^{path}$"
 
 
 route_registry = RouteRegistry()
