@@ -1,4 +1,4 @@
-from framework.app import WebApp
+from framework.web_app import WebApp
 
 app = WebApp()
 
@@ -6,4 +6,5 @@ app = WebApp()
 app.modules(["user"])
 
 if __name__ == "__main__":
-    app.run()
+    app.run(reload=True)
+

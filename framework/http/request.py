@@ -19,6 +19,21 @@ class Request:
         self.http_version = None
 
     def parse_request(self, data):
+        """
+        Parses a raw HTTP request string and extracts its components.
+        Args:
+            data (str): The raw HTTP request as a string.
+        Sets:
+            self.method (str): The HTTP method (e.g., 'GET', 'POST').
+            self.http_version (str): The HTTP version (e.g., 'HTTP/1.1').
+            self.r_path (str): The original request path (may include query string).
+            self.path (str): The URL path component (without query string).
+            self.query_params (dict): Dictionary of query parameters parsed from the URL.
+            self.headers (dict): Dictionary of HTTP headers.
+            self._body (str or None): The request body, if present; otherwise None.
+        Raises:
+            ValueError: If the request line is malformed or missing required components.
+        """
 
         lines = data.splitlines()
         request_line = lines[0]
@@ -49,10 +64,6 @@ class Request:
             raise ContentTypeException()
 
         return json.loads(self._body) if self._body else {}
-
-    def set_header(self, name: str, value: str):
-        """Set a header value by its name."""
-        self.headers[name] = value
 
     def __str__(self):
         return f"[Request] {self.method} {self.r_path}"
