@@ -24,21 +24,34 @@ No external dependencies required (uses Python standard library) ✅
 ```bash
 .
 ├── app.py
-├── framework/
-│   ├── constants.py
-│   ├── http/
-│   │   ├── request.py
-│   │   ├── responses.py
-│   │   ├── server.py
-│   │   └── status.py
-│   ├── route/
-│   │   ├── __init__.py
-│   │   └── register.py
-│   ├── utils.py
-│   ├── watcher.py
-│   └── web_app.py
-└── user/
+├── framework
+│   ├── constants.py
+│   ├── exceptions
+│   │   └── exceptions.py
+│   ├── handler
+│   │   ├── base.py
+│   │   └── __init__.py
+│   ├── http
+│   │   ├── __init__.py
+│   │   ├── request.py
+│   │   ├── responses.py
+│   │   ├── server.py
+│   │   └── status.py
+│   ├── __init__.py
+│   ├── route
+│   │   ├── __init__.py
+│   │   └── register.py
+│   ├── utils.py
+│   ├── watcher.py
+│   └── web_app.py
+├── __init__.py
+├── product
+│   ├── handler.py
+│   ├── __init__.py
+│   └── routes.py
+└── user
     ├── handler.py
+    ├── __init__.py
     └── routes.py
 ```
 
