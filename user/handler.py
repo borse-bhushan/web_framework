@@ -9,6 +9,17 @@ USERS = []
 def create_user(request: Request):
     req_data = request.body
 
+    if "first_name" not in req_data:
+        return JsonResponse(data={"error": "first_name is required"}, status=400)
+
+    req_data["user_id"] = str(uuid4())
+    USERS.append(req_data)
+    return JsonResponse(data=req_data)
+
+
+def create_user(request: Request):
+    req_data = request.body
+
     req_data["user_id"] = str(uuid4())
 
     USERS.append(req_data)
@@ -30,6 +41,10 @@ def get_all_user(request: Request):
 
 def update_user(request: Request, user_id):
     req_data = request.body
+
+    if "first_name" not in req_data:
+        return JsonResponse(data={"error": "first_name is required"}, status=400)
+
     for user in USERS:
         if user["user_id"] == user_id:
             user.update(req_data)

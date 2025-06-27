@@ -11,6 +11,7 @@ It provides routing with path and path parameters, a file watcher for auto-reloa
 - 🧾 **HTTP Request Parser**: Parses HTTP requests, headers, body, and query parameters
 - 🧱 **Modular Structure**: Organize your app with modules and handlers
 - 🛑 **Custom Exceptions**: Handle errors gracefully with extensible custom exception support
+- 🧑‍🏫 **Class-Based Handlers**: Build APIs using class-based views with auto-route registration
 
 ## ⚙️ Getting Started
 
@@ -115,6 +116,40 @@ app.modules(["user"])
 
 if __name__ == "__main__":
     app.run(reload=True)
+```
+
+---
+
+### 🧩 Class-Based Handler Example
+
+Define a handler class by extending `BaseAPIHandler` and implement method-based views:
+
+```python
+from framework.handler.base import BaseAPIHandler
+
+class SampleHandler(BaseAPIHandler):
+    lookup_field = "item_id"
+
+    def get_item(self, request, item_id):
+        pass
+
+    def create_item(self, request):
+        pass
+```
+
+### 🔗 Registering Class-Based Routes
+
+```python
+from .handler import SampleHandler
+
+SampleHandler.register_routes(
+    "/item",
+    {
+        "get": ["get_item"],
+        "post": "create_item",
+        "details": ["get_item"],
+    },
+)
 ```
 
 ---
