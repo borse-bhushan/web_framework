@@ -22,7 +22,7 @@ class WebApp:
 
         sys.path.append(get_base_dir())
 
-    def run(self, host=None, port=None, reload=False):
+    def run(self, host=None, port=None, reload=True):
         """
         Starts the web server with optional auto-reload support.
         Args:

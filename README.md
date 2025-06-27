@@ -10,6 +10,7 @@ It provides routing with path and path parameters, a file watcher for auto-reloa
 - 📦 **Response Classes**: Easily return JSON or custom responses
 - 🧾 **HTTP Request Parser**: Parses HTTP requests, headers, body, and query parameters
 - 🧱 **Modular Structure**: Organize your app with modules and handlers
+- 🛑 **Custom Exceptions**: Handle errors gracefully with extensible custom exception support
 
 ## ⚙️ Getting Started
 
