@@ -169,4 +169,4 @@ SampleHandler.register_routes(
 
 ## 👨‍💻 Author
 
-- 🧑‍💻 Bhushan Borse*
+- 🧑‍💻 Bhushan Borse
