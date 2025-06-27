@@ -8,6 +8,9 @@ from .utils import get_base_dir
 from .http.server import HTTPRequestHandler, HTTPServer
 
 
+class AutoReload: ...
+
+
 class WebApp:
     def __init__(self):
         self.host = None
@@ -22,7 +25,7 @@ class WebApp:
 
         sys.path.append(get_base_dir())
 
-    def run(self, host=None, port=None, reload=True):
+    def run(self, host=None, port=None, reload=AutoReload):
         """
         Starts the web server with optional auto-reload support.
         Args:
@@ -35,7 +38,7 @@ class WebApp:
         self.host = host or constants.DEFAULT_HOST
         self.port = port or constants.DEFAULT_PORT
 
-        if reload and not "--noreload" in sys.argv:
+        if reload in (AutoReload, True) and not "--noreload" in sys.argv:
             print("🔁 Running with auto-reload...")
             try:
                 subprocess.run(

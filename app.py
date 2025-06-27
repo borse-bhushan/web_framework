@@ -7,4 +7,3 @@ app.modules(["user"])
 
 if __name__ == "__main__":
     app.run(reload=True)
-
